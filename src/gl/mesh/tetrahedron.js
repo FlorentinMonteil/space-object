@@ -2,10 +2,12 @@ import glMatrix        from 'gl-matrix';
 import Emitter         from 'eventemitter3';
 import Mouse           from 'utils/mouse';
 import GUI             from 'dev/gui';
+import GeomLoader      from 'gl/geoms/geom-loader';
 
 import PyramidPRG      from 'gl/programs/tetrahedron';
 import tetrahedronGeom from 'gl/geoms/tetrahedron.json';
 import Textures        from 'assets/textures';
+
 
 var prg = null;
 
@@ -52,48 +54,11 @@ export default class TetrahedronMesh extends Emitter {
     this._wmatrix[13] =  this.y;
     this._wmatrix[14] =  this.z;
 
-    // PYRAMID GEOM
-    this.geom = tetrahedronGeom;
-    var vertices = new Float32Array( this.geom.facePositions.length * 9 )
-    var normals  = new Float32Array( this.geom.facePositions.length * 9 )
-    var uvs      = new Float32Array( this.geom.facePositions.length * 9 )
-    var i = 0;
-    var j = 0;
-    var faceIndex   = 0;
-    var normalIndex = 0;
-    this.geom.facePositions.forEach((face)=>{
-      face.forEach((vIndex)=>{
-        for(j = 0; j<3; j++){
-          vertices[ i ] = this.geom.vertexPositions[ vIndex      ][ j ];
-          i += 1;
-        }
-      });
-      faceIndex += 1;
-    });
+    this.geom = GeomLoader.parseFlattern( tetrahedronGeom );
 
-    i = 0;
-    j = 0;
-    this.geom.faceNormals.forEach((face)=>{
-      face.forEach((vIndex)=>{
-        for(j = 0; j<3; j++){
-          normals[ i ] = this.geom.vertexNormals[ vIndex ][ j ];
-          i += 1;
-        }
-      });
-    });
-
-    i = 0;
-    j = 0;
-    this.geom.faceUVs.forEach((face)=>{
-      face.forEach((vIndex)=>{
-        for(j = 0; j<2; j++){
-          uvs[ i ] = this.geom.vertexUVs[ vIndex ][ j ];
-          i += 1;
-        }
-      });
-    });
-
-    this.vertices = vertices;
+    var vertices = this.geom.vertices;
+    var normals  = this.geom.normals;
+    var uvs      = this.geom.uvs;
 
     this.verticesBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesBuffer);
@@ -117,61 +82,63 @@ export default class TetrahedronMesh extends Emitter {
     this.normalsBuffer.itemSize = 3;
     this.normalsBuffer.numItems = normals.length / 3;
 
-    this.diffuse          = Textures.getTexture(  'granite_D'  );
-    this.normalMap        = Textures.getTexture(  'granite_N'  );
-    this.ambiantOcclusion = Textures.getTexture(  'granite_AO' );
+    this.tDiffuse          = Textures.getTexture(  'granite_D'  );
+    this.tNormalMap        = Textures.getTexture(  'granite_N'  );
+    this.tAmbiantOcclusion = Textures.getTexture(  'granite_AO' );
 
-    this.edgeIndex = Math.floor(Math.random() * this.vertices.length / 3);
+    this.edgeIndex = null;
     this.edgeAngle = 0;
-    this.edgeAxis = [Math.random(), Math.random(), Math.random()];
-    this.speed = Math.random() * 2 - 1;
-    this.amplitude = 1 + Math.random() * 4;
+    this.spinTime  = 0;
 
     if(id){
       this.id = id;
-      GUI.remember(this);
-      var ctrl = GUI.addFolder('tetrahedron_'+id);
-      ctrl.add(this, 'x', -5.0, 5.0);
-      ctrl.add(this, 'y', -5.0, 5.0);
-      ctrl.add(this, 'z', -5.0, 5.0);
-      this.edgeRotate = 0;
-      ctrl.add(this, 'edgeRotate', 0, Math.PI).onChange((val)=>{
-        this.rotateFromEdge( this.edgeRotate - this.edgeAngle, this.edgeIndex );
+      var ctrl = GUI.addFolder('tetrhedron__'+id);
+      var o = {rotate: 0};
+      ctrl.add(o, 'rotate', - (Math.PI * 2 - 2 * Math.acos(1/3)), 0).onChange(()=>{
+        this.rotateFromEdge(o.rotate - this.edgeAngle, this.edgeIndex);
       });
-
-      // ctrl.add(this, 'edgeIndex', [0, 1, 2, 3, 4]).onChange((val)=>{
-      //   this.edgeIndex = parseInt(val);
-      // });
-
+      ctrl.add(this, 'edgeIndex', [0, 1, 2, 3, 4, 5, 6]).onChange(()=>{
+        this.edgeIndex = parseInt(this.edgeIndex);
+      })
     }
 
   }
 
   rotateFromEdge(angle, edgeIndex){
+
     this.edgeAngle += angle;
     this.edgeIndex  = edgeIndex;
-    this.edgeRotate = this.edgeAngle;
-    var v = this.vertices; 
-    var o = [ 
-      v[ (edgeIndex * 3)     ],// * this.amplitude,
-      v[ (edgeIndex * 3) + 1 ],//* this.amplitude,
-      v[ (edgeIndex * 3) + 2 ]// * this.amplitude
+
+    var index = this.edgeIndex;
+    // if(this.edgeIndex == 6){
+    //   index = 9;
+    // }
+
+    var v = this.geom.vertices;
+
+    var v1 = [ 
+      v[ (index * 3)     ],
+      v[ (index * 3) + 1 ],
+      v[ (index * 3) + 2 ]
     ];
-    var o2 = [
-      v[ (edgeIndex + 1) * 3     ],// * this.amplitude,
-      v[ (edgeIndex + 1) * 3 + 1 ],//* this.amplitude,
-      v[ (edgeIndex + 1) * 3 + 2 ]// * this.amplitude
+
+    var v2 = [
+      v[ (index + 1) * 3     ],
+      v[ (index + 1) * 3 + 1 ],
+      v[ (index + 1) * 3 + 2 ]
     ]
 
-    var a = [ o[0] - o2[0], o[1] - o2[1], o[2] - o2[2] ];
-    // console.log(o, a, edgeIndex);
-    mat4.translate(this.__wmatrix, this._wmatrix, o);
-    mat4.rotate( this.__wmatrix, this.__wmatrix, angle, a );
-    mat4.translate(this.__wmatrix, this.__wmatrix, [-o[0], -o[1], -o[2]]);
+    var axis   = [ v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2] ];
+    var origin = v1;
+    var invOrigin = [
+      -origin[0],
+      -origin[1],
+      -origin[2]
+    ]
 
-    // var translation = [ 
-    //   rOrigin
-    // ];
+    mat4.translate(this.__wmatrix, this._wmatrix, origin);
+    mat4.rotate( this.__wmatrix, this.__wmatrix, angle, axis );
+    mat4.translate(this.__wmatrix, this.__wmatrix, invOrigin);
 
   }
 
@@ -219,26 +186,21 @@ export default class TetrahedronMesh extends Emitter {
     // TEXTURE
     gl.uniform1i(this.prg.program.tDiffuse, 0);
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.diffuse);
+    gl.bindTexture(gl.TEXTURE_2D, this.tDiffuse);
 
     gl.uniform1i(this.prg.program.tNormalMap, 1);
     gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, this.normalMap);
+    gl.bindTexture(gl.TEXTURE_2D, this.tNormalMap);
 
     gl.uniform1i(this.prg.program.tAmbiantOcclusion, 2);
     gl.activeTexture(gl.TEXTURE2);
-    gl.bindTexture(gl.TEXTURE_2D, this.ambiantOcclusion);
+    gl.bindTexture(gl.TEXTURE_2D, this.tAmbiantOcclusion);
 
     if(this.wire){
       gl.drawArrays(gl.LINE_LOOP, 0, this.verticesBuffer.numItems);
     } else {
       gl.drawArrays(gl.TRIANGLES, 0, this.verticesBuffer.numItems);
     }
-    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
-
-    // gl.drawElements(gl.TRIANGLES, this.indicesBuffer.numItems*3*progress.value, gl.UNSIGNED_SHORT, 0);
-
-
 
   }
 

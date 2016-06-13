@@ -55,7 +55,7 @@ void main(void)
   gl_FragColor.rgb *= specularIntensity * texture2D(tAmbiantOcclusion, uv.st).rgb;
   gl_FragColor.rgb += vec3(max(fSpec, 0.2) * specularColour.rgb) * texture2D(tAmbiantOcclusion, uv.st).rgb;
 
-  // gl_FragColor = vec4(vNormal.x, vNormal.x, vNormal.z/3.0, 1.0);
+  gl_FragColor = vec4(uv, 1.0, 1.0);
 
   // gl_FragColor = texture2D(tDiffuse, uv.st);
 
