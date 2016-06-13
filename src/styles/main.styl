@@ -1,0 +1,47 @@
+@import "./reset.styl"
+
+html,
+body,
+#collection-webgl{
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  position: relative;
+  overflow: hidden;
+}
+
+h1{
+  text-transform: uppercase;
+  color: #FFFFFF;
+  font-family: "Helvetica", "Arial";
+  font-weight: bold;
+  font-size: 50px;
+  text-shadow: 1px 1px #1565C0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  user-select: none;
+}
+
+
+#iframe-music{
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -200px;
+  margin-left: -200px;
+  z-index: 10;
+  perspective: 200;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: transform 0.4s ease-out, opacity 0.4s linear;
+  &.active{
+    pointer-events: inherit;
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}

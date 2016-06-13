@@ -1,0 +1,62 @@
+{
+  "name": "fast-starter",
+  "version": "0.0.1",
+  "description": "Fast starter with webpack babel and stylus by flousse",
+  "scripts": {
+    "start": "./node_modules/.bin/webpack-dev-server --hot --inline --host 0.0.0.0 --config webpack.config.js",
+    "build": "./node_modules/.bin/webpack -p --config webpack.config.js"
+  },
+  "author": "Florentin Monteil",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/FlorentinMonteil/fast-starter.git"
+  },
+  "dependencies": {
+    "dat-gui": "^0.5.0",
+    "eventemitter3": "^1.1.1",
+    "face-normals": "0.0.0",
+    "gl-matrix": "2.3.1",
+    "glsl-easings": "^1.0.0",
+    "glsl-noise": "0.0.0",
+    "glslify": "^5.0.2",
+    "gsap": "^1.18.4",
+    "icosphere": "^1.0.0",
+    "leapjs": "^0.6.4",
+    "lookat-camera": "^1.0.0",
+    "nanogl": "0.2.5",
+    "nanogl-camera": "^0.1.2",
+    "nanogl-mouse": "0.1.1",
+    "nanogl-node": "^0.1.2",
+    "nanogl-primitives-2d": "0.1.1",
+    "nanogl-renderer": "0.1.3",
+    "nanogl-state": "0.1.10",
+    "nanogl-texture-loader": "FlorentinMonteil/nanogl-texture-loader",
+    "orbit-camera-controller": "^4.0.0",
+    "primitive-sphere": "^2.0.0",
+    "primitive-torus": "^1.0.4",
+    "requestanimationframe": "0.0.22",
+    "three": "^0.77.1",
+    "when": "^3.7.4"
+  },
+  "devDependencies": {
+    "autoprefixer": "^6.2.1",
+    "babel-core": "^5.8.24",
+    "babel-loader": "^5.3.2",
+    "babel-runtime": "^5.8.20",
+    "copy-webpack-plugin": "^0.3.3",
+    "css-loader": "^0.21.0",
+    "file-loader": "^0.8.4",
+    "glsl-loader": "0.0.1",
+    "html-loader": "^0.3.0",
+    "html-webpack-plugin": "^1.6.1",
+    "json-loader": "^0.5.4",
+    "parse-obj": "0.0.0",
+    "postcss": "^5.0.13",
+    "postcss-loader": "^0.8.0",
+    "style-loader": "^0.12.1",
+    "stylus-loader": "^1.4.0",
+    "webpack": "^1.12.0",
+    "webpack-dev-server": "^1.10.1"
+  }
+}
