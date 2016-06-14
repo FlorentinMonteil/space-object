@@ -27,7 +27,7 @@ export default class Camera extends Emitter{
     this.arc_progress = 0.63;
 
     this.x    = 0.0;
-    this.y    = -1.0;
+    this.y    = -4.0;
     this.z    = 0.0;
 
     mat4.identity( this._view );
@@ -60,6 +60,11 @@ export default class Camera extends Emitter{
       0.1,      // near
       1000.0    // far
     );
+
+    this.arc_progress += 0.001;
+    if(this.arc_progress == 1){
+      this.arc_progress = 0;
+    }
 
     this.x = Math.cos(this.arc_progress * Math.PI*2) * this.radius;
     this.z = Math.sin(this.arc_progress * Math.PI*2) * this.radius;
