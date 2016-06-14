@@ -35,10 +35,10 @@ export default class CoverMesh extends Emitter {
 
     this.prg.use();
 
-    this.exposure              = 0.7;
-    this.decay                 = 0.92;
-    this.density               = 0.7;
-    this.weight                = 0.3;
+    this.exposure              = 0.07;
+    this.decay                 = 0.94;
+    this.density               = 0.94;
+    this.weight                = 0.61;
     this.lightPositionOnScreen = {
       x: 0.5,
       y: 0.5

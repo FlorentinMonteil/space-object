@@ -199,11 +199,11 @@ export default class TetrahedronMesh extends Emitter {
     gl.activeTexture(gl.TEXTURE2);
     gl.bindTexture(gl.TEXTURE_2D, this.tAmbiantOcclusion);
 
-    // if(this.wire){
+    if(this.wire && !lights){
       // gl.drawArrays(gl.LINE_LOOP, 0, this.verticesBuffer.numItems);
-    // } else {
+    } else {
       gl.drawArrays(gl.TRIANGLES, 0, this.verticesBuffer.numItems);
-    // }
+    }
 
   }
 

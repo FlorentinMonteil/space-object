@@ -24,7 +24,7 @@ void main(void)
 
   vec2 uv = vUv;
   // uv *= 5.0;
-  vec3 lightDir = vec3(uMouse.x*5.0, uMouse.y*5.0, -1.0);
+  vec3 lightDir = vec3(0.0, -0.5, -1.0);
   // vec3 lightDir = vec3(vViewPosition);
 
   const float maxVariance = 5.0; // Mess around with this value to increase/decrease normal perturbation
@@ -57,7 +57,9 @@ void main(void)
   gl_FragColor.rgb *= specularIntensity * texture2D(tAmbiantOcclusion, uv.st).rgb;
   gl_FragColor.rgb += vec3(max(fSpec, 0.2) * specularColour.rgb) * texture2D(tAmbiantOcclusion, uv.st).rgb;
 
-  gl_FragColor = mix(vec4(uv, 1.0, 1.0), vec4(uLight, uLight, uLight, 1.0), uLightRender);
+
+
+  gl_FragColor = mix(gl_FragColor, vec4(uLight, uLight, uLight, 1.0), uLightRender);
   // gl_FragColor = vec4(uLight, uLight, uLight, 1.0);
 
   // gl_FragColor = texture2D(tDiffuse, uv.st);

@@ -23,11 +23,11 @@ export default class Camera extends Emitter{
     this._proj     = mat4.create()
     this._viewProj = mat4.create()
 
-    this.radius       = 4;
-    this.arc_progress = 0.63;
+    this.radius       = 2.2;
+    this.arc_progress = 0.43;
 
     this.x    = 0.0;
-    this.y    = -4.0;
+    this.y    = -3.0;
     this.z    = 0.0;
 
     mat4.identity( this._view );
