@@ -83,7 +83,7 @@ export default class MainGL {
 
     }
 
-    // this.scene.addObject( this.basePyramid );
+    this.scene.addObject( this.basePyramid );
 
   }
 

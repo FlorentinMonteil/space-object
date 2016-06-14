@@ -23,7 +23,7 @@ void main(void)
   vec2 uv = vUv;
   // uv *= 5.0;
   vec3 lightDir = vec3(uMouse.x*5.0, uMouse.y*5.0, -1.0);
-  // vec3 lightDir = vec3(0.5, 0.5, -1.0);
+  // vec3 lightDir = vec3(vViewPosition);
 
   const float maxVariance = 5.0; // Mess around with this value to increase/decrease normal perturbation
   const float minVariance = maxVariance / 2.0;
