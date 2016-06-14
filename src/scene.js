@@ -30,10 +30,10 @@ export default class Scene {
     }
   }
 
-  render(camera){
+  render(camera, lights){
 
     for (var i=0, max=this.objects.length; i<max; i++) {
-      this.objects[i].render(camera);
+      this.objects[i].render(camera, lights);
     }
 
   }

@@ -11,7 +11,7 @@ import Mouse        from 'utils/mouse';
 
 var startTime = 0;
 
-var SPIN_DURATION = 2000;
+var SPIN_DURATION = 3000;
 
 export default class MainGL {
 
@@ -68,13 +68,9 @@ export default class MainGL {
         var a = orientation * (Math.PI * 2 - 2 * Math.acos(1/3));
         pyramid.rotateFromEdge(a, e);
         e = this.getEdgeIndexByStep( e, j + 1 );
-        console.log(e);
         pyramid.edgeIndex = e;
       }
 
-      // pyramid.edgeIndex = edgeIndex;
-      // edgeIndex         = this.getEdgeIndexByStep( pyramid.edgeIndex, pyramid.step );
-      // pyramid.step      = i;
       pyramid.edgeAngle = 0;
       pyramid.spinTime  = 0;
 
@@ -101,14 +97,12 @@ export default class MainGL {
       return;
     }
 
-    SPIN_DURATION = 2000 * Math.abs(Mouse.x);
-
     var t = Date.now() - startTime;
 
     for (var i = 0; i < this.rotatingPyramids.length; i++) {
 
       var p = this.rotatingPyramids[i];
-      var spinProgress = (t - p.spinTime)/SPIN_DURATION;
+      var spinProgress = Ease.easeOutCubic((t - p.spinTime)/SPIN_DURATION);
       var orientation = (p.edgeIndex % 3) == 0 ? -1 : 1;
       if(p.step == 3){
         orientation = -orientation;

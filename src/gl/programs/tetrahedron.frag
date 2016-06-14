@@ -5,7 +5,9 @@ uniform float uTime;
 uniform sampler2D tDiffuse;
 uniform sampler2D tNormalMap;
 uniform sampler2D tAmbiantOcclusion;
+uniform float uLight;
 uniform vec2 uMouse;
+uniform float uLightRender;
 
 varying vec2 vUv;
 varying vec3 vNormal;
@@ -55,7 +57,8 @@ void main(void)
   gl_FragColor.rgb *= specularIntensity * texture2D(tAmbiantOcclusion, uv.st).rgb;
   gl_FragColor.rgb += vec3(max(fSpec, 0.2) * specularColour.rgb) * texture2D(tAmbiantOcclusion, uv.st).rgb;
 
-  gl_FragColor = vec4(uv, 1.0, 1.0);
+  gl_FragColor = mix(vec4(uv, 1.0, 1.0), vec4(uLight, uLight, uLight, 1.0), uLightRender);
+  // gl_FragColor = vec4(uLight, uLight, uLight, 1.0);
 
   // gl_FragColor = texture2D(tDiffuse, uv.st);
 

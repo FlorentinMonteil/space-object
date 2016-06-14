@@ -90,17 +90,17 @@ export default class TetrahedronMesh extends Emitter {
     this.edgeAngle = 0;
     this.spinTime  = 0;
 
-    if(id){
-      this.id = id;
-      var ctrl = GUI.addFolder('tetrhedron__'+id);
-      var o = {rotate: 0};
-      ctrl.add(o, 'rotate', - (Math.PI * 2 - 2 * Math.acos(1/3)), 0).onChange(()=>{
-        this.rotateFromEdge(o.rotate - this.edgeAngle, this.edgeIndex);
-      });
-      ctrl.add(this, 'edgeIndex', [0, 1, 2, 3, 4, 5, 6]).onChange(()=>{
-        this.edgeIndex = parseInt(this.edgeIndex);
-      })
-    }
+    // if(id){
+    //   this.id = id;
+    //   var ctrl = GUI.addFolder('tetrhedron__'+id);
+    //   var o = {rotate: 0};
+    //   ctrl.add(o, 'rotate', - (Math.PI * 2 - 2 * Math.acos(1/3)), 0).onChange(()=>{
+    //     this.rotateFromEdge(o.rotate - this.edgeAngle, this.edgeIndex);
+    //   });
+    //   ctrl.add(this, 'edgeIndex', [0, 1, 2, 3, 4, 5, 6]).onChange(()=>{
+    //     this.edgeIndex = parseInt(this.edgeIndex);
+    //   })
+    // }
 
   }
 
@@ -142,7 +142,7 @@ export default class TetrahedronMesh extends Emitter {
 
   }
 
-  render(camera){
+  render(camera, lights){
 
     let gl = this.gl;
 
@@ -181,6 +181,9 @@ export default class TetrahedronMesh extends Emitter {
 
     this.prg.uCameraPosition([camera.x, camera.y, camera.z]);
 
+    this.prg.uLightRender( lights );
+    this.prg.uLight( this.wire );
+
     this.prg.uMouse([Mouse.x, Mouse.y]);
 
     // TEXTURE
@@ -196,11 +199,11 @@ export default class TetrahedronMesh extends Emitter {
     gl.activeTexture(gl.TEXTURE2);
     gl.bindTexture(gl.TEXTURE_2D, this.tAmbiantOcclusion);
 
-    if(this.wire){
-      gl.drawArrays(gl.LINE_LOOP, 0, this.verticesBuffer.numItems);
-    } else {
+    // if(this.wire){
+      // gl.drawArrays(gl.LINE_LOOP, 0, this.verticesBuffer.numItems);
+    // } else {
       gl.drawArrays(gl.TRIANGLES, 0, this.verticesBuffer.numItems);
-    }
+    // }
 
   }
 
