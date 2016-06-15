@@ -1,17 +1,23 @@
 import glMatrix     from 'gl-matrix';
 import Ease         from 'utils/ease';
-
+import Mouse        from 'utils/mouse';
 import globalStates from 'states/global-states';
 import Textures     from 'assets/textures';
+
+
 import Renderer     from 'renderer';
 import Scene        from 'scene';
 import Camera       from 'camera';
-import Tetrahedron  from 'gl/mesh/tetrahedron';
-import Mouse        from 'utils/mouse';
+
+
+import Env          from 'gl/entities/env';
+import Tetrahedron  from 'gl/entities/tetrahedron';
+import InnerLight   from 'gl/entities/inner-light';
+
 
 var startTime = 0;
 
-var SPIN_DURATION = 3000;
+var SPIN_DURATION = 5000;
 
 export default class MainGL {
 
@@ -79,7 +85,13 @@ export default class MainGL {
 
     }
 
-    this.scene.addObject( this.basePyramid );
+    // this.scene.addObject( this.basePyramid );
+
+    this.innerLight = new InnerLight( this.renderer.gl );
+    this.scene.addObject( this.innerLight );
+
+    this.env = new Env( this.renderer.gl );
+    this.scene.addObject( this.env );
 
   }
 
@@ -102,7 +114,7 @@ export default class MainGL {
     for (var i = 0; i < this.rotatingPyramids.length; i++) {
 
       var p = this.rotatingPyramids[i];
-      var spinProgress = Ease.easeOutCubic((t - p.spinTime)/SPIN_DURATION);
+      var spinProgress = Ease.easeInOutCubic((t - p.spinTime)/SPIN_DURATION);
       var orientation = (p.edgeIndex % 3) == 0 ? -1 : 1;
       if(p.step == 3){
         orientation = -orientation;

@@ -11,6 +11,7 @@ attribute vec3 aNormal;
 varying vec2 vUv;
 varying vec3 vNormal;
 varying vec3 vViewPosition;
+varying vec3 vPos;
 
 void main(void) {
 
@@ -20,6 +21,7 @@ void main(void) {
 
   vUv = aUv;
   vNormal = normalize(mat3(uM) * aNormal);
+  vPos = gl_Position.xyz;
   vViewPosition = uCameraPosition;
 
 }
