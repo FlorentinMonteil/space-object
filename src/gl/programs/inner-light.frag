@@ -1,6 +1,7 @@
 precision highp float;
 
 uniform float uTime;
+uniform float uReveal;
 
 varying vec2 vUv;
 
@@ -15,7 +16,6 @@ void main(void) {
 
   vec2 uv    = vUv;
   float white = step(distance(uv, vec2(0.5, 0.5)), 0.1);
-
   white += circle(uv, 4.0, 2.0);
   white += circle(uv, 2.0, 5.0);
   white += circle(uv, 4.5, 10.0);
@@ -38,6 +38,8 @@ void main(void) {
   white += circle(uv, 3.8026, 5.6140);
   white += circle(uv, 3.0208, 4.0112);
   white += circle(uv, 6.1247, 4.1470);
+
+  white *= uReveal;
 
   vec3 color  = vec3(white, white/2.0, white);
   gl_FragColor = vec4(color, color.r);

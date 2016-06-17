@@ -6,59 +6,36 @@ uniform sampler2D tDiffuse;
 uniform sampler2D tNormalMap;
 uniform sampler2D tAmbiantOcclusion;
 uniform float uLight;
-uniform vec2 uMouse;
 uniform float uLightRender;
+uniform float uLighten;
 
 varying vec2 vUv;
 varying vec3 vNormal;
 varying vec3 vViewPosition;
 
 // Uniforms
-uniform vec4 ambientColour;
-uniform vec4 diffuseColour;
-uniform vec4 specularColour;
-varying vec3 vPos;
+uniform vec4 ambientColor;
+uniform vec4 diffuseColor;
+varying vec4 vPos;
 
 void main(void)
 { 
 
   vec2 uv = vUv;
-  // uv *= 5.0;
-  vec3 lightDir = vec3(1.0, 1.0, 1.0);
-  // vec3 lightDir = vec3(vViewPosition);
+  vec3 lightDir = normalize( vec3(0.0) - vPos.xyz );
 
-  const float maxVariance = 0.0001; // Mess around with this value to increase/decrease normal perturbation
-  const float minVariance = maxVariance / 2.0;
+  vec3 normalAdjusted = normalize(vNormal) + (texture2D(tNormalMap, uv.st).rgb * 1.0 - 0.5);
 
-  // Create a normal which is our standard normal + the normal map perturbation (which is going to be either positive or negative)
-  vec3 normalAdjusted = normalize(vNormal);// + normalize(texture2D(tNormalMap, vUv.st).rgb * maxVariance - minVariance);
+  vec3 AO = texture2D(tAmbiantOcclusion, uv).rgb;
 
-  // Calculate diffuse intensity
-  float diffuseIntensity = max(0.0, dot(normalize(normalAdjusted), normalize(lightDir)));
+  float diffuseIntensity = max(0.0, dot(normalize(normalAdjusted), normalize(lightDir))) * AO.r * 1.5 * uLighten;
 
-  // Add the diffuse contribution blended with the standard texture lookup and add in the ambient light on top
-  vec3 colour = (diffuseIntensity * diffuseColour.rgb) * texture2D(tDiffuse, uv.st).rgb + ambientColour.rgb;
+  vec3 colour = ((diffuseIntensity * diffuseColor.rgb) + ambientColor.rgb) * texture2D(tDiffuse, uv.st).rgb;
 
-  // Set the almost final output color as a vec4 - only specular to go!
   gl_FragColor = vec4(colour, 1.0);
 
-  // Calc and apply specular contribution
-  vec3 vReflection        = normalize(reflect(-normalize(normalAdjusted), normalize(lightDir)));
-  float specularIntensity = max(0.0, dot(normalize(normalAdjusted), vReflection));
+  gl_FragColor = mix(gl_FragColor, vec4(vec3(uLight), 1.0), uLightRender);
 
-  // // If the diffuse light intensity is over a given value, then add the specular component
-  // // Only calc the pow function when the diffuseIntensity is high (adding specular for high diffuse intensities only runs faster)
-  // // Put this as 0 for accuracy, and something high like 0.98 for speed
-
-  float baseLightRadius = 64.0;
-  float ifSpec = (1.0 - sqrt(uMouse.x*uMouse.x + uMouse.y*uMouse.y))*(baseLightRadius-1.0);
-  ifSpec = 0.0;// (1.0 - sqrt(uMouse.x*uMouse.x + uMouse.y*uMouse.y))*(baseLightRadius-1.0);
-  float fSpec = pow(specularIntensity, baseLightRadius - ifSpec);
-  gl_FragColor.rgb *= specularIntensity * texture2D(tAmbiantOcclusion, uv.st).rgb;
-  gl_FragColor.rgb += vec3(max(fSpec, 0.2) * specularColour.rgb) * texture2D(tAmbiantOcclusion, uv.st).rgb;
-
-  // gl_FragColor = vec4( uv, 1.0, 1.0 );
-
-  gl_FragColor = mix(gl_FragColor, vec4(uLight, uLight, uLight, 1.0), uLightRender);
+  // gl_FragColor = vec4(colour, 1.0);
 
 }

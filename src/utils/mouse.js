@@ -18,11 +18,6 @@ class Mouse extends Emitter {
     this.onMouseDown = this._onMouseDown.bind(this);
     this.onMouseUp   = this._onMouseUp.bind(this);
 
-    document.addEventListener('mousemove', this.onMouseMove);
-    document.addEventListener('touchmove', this.onMouseMove);
-    document.addEventListener('click', (e)=>{
-      this.emit('click');
-    });
 
     this.onResize    = this._onResize.bind(this);
     window.addEventListener('resize', this.onResize);
@@ -30,7 +25,22 @@ class Mouse extends Emitter {
 
   }
 
+  setUp( el ){
+
+    el.addEventListener('mousemove', this.onMouseMove);
+    el.addEventListener('touchmove', this.onMouseMove);
+    el.addEventListener('mousedown', this.onMouseDown);
+    el.addEventListener('mouseup',   this.onMouseUp);
+    el.addEventListener('click', (e)=>{
+      this.emit('click');
+    });
+
+  }
+
   _onMouseMove(e){
+
+    e.preventDefault();
+    this.emit('mousemove', this);
 
     let pos = [ e.clientX, e.clientY ];
 
@@ -46,13 +56,6 @@ class Mouse extends Emitter {
     this.clientX = pos[0];
     this.clientY = pos[1];
 
-    this.emit('mousemove', this);
-
-  }
-
-  _onMouseMove(e){
-
-    e.preventDefault();
     this.emit('mousemove', this);
 
   }

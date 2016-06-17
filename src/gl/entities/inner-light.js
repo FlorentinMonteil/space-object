@@ -49,8 +49,16 @@ export default class InnerLight {
 
     this.startTime = Date.now();
 
+    this.reveal = 0;
+    var ctrl = GUI.addFolder('light');
+    ctrl.add(this, 'reveal', 0, 1);
+
     this.prg.use();
 
+  }
+
+  show(){
+    TweenMax.fromTo(this, 2.5, {reveal: 0}, {reveal: 1} );
   }
 
   render(camera, lights){
@@ -87,7 +95,7 @@ export default class InnerLight {
     camera.modelViewProjectionMatrix( M4, M4 );
 
     this.prg.uMVP( M4 );
-
+    this.prg.uReveal( this.reveal );
     this.prg.uTime( t );
 
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.verticesBuffer.numItems);

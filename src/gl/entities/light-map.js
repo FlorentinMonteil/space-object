@@ -45,7 +45,7 @@ export default class LightMap {
     this.prg.density( this.density );
     this.prg.weight( this.weight );
 
-    var ctrl = GUI.addFolder('scattering');
+    var ctrl = GUI.addFolder('ambient');
     ctrl.add(this, 'exposure', 0, 1);
     ctrl.add(this, 'decay', 0, 2);
     ctrl.add(this, 'density', 0, 1);

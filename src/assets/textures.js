@@ -12,11 +12,41 @@ class Textures {
 
     this.gl    = gl;
 
-    var granite = "assets/textures/black-white-granite/";
-    this.makeTex( "granite_AO", granite + "/T_BlackWhiteGranite_AO.png", gl.REPEAT, gl.REPEAT );
-    this.makeTex( "granite_D",  granite + "/T_BlackWhiteGranite_BC.png", gl.REPEAT, gl.REPEAT );
-    this.makeTex( "granite_HM", granite + "/T_BlackWhiteGranite_H.png",  gl.REPEAT, gl.REPEAT );
-    this.makeTex( "granite_N",  granite + "/T_BlackWhiteGranite_N.png",  gl.REPEAT, gl.REPEAT );
+    // var granite = "assets/textures/black-white-granite/";
+    // this.makeTex( "granite_AO", granite + "/T_BlackWhiteGranite_AO.png", gl.REPEAT, gl.REPEAT );
+    // this.makeTex( "granite_D",  granite + "/T_BlackWhiteGranite_BC.png", gl.REPEAT, gl.REPEAT );
+    // this.makeTex( "granite_N",  granite + "/T_BlackWhiteGranite_N.png",  gl.REPEAT, gl.REPEAT );
+
+    // var adams    = "src/assets/textures/adams";
+    // this.makeTex( "adams_AO", adams + "/AO.png", gl.REPEAT, gl.REPEAT );
+    // this.makeTex( "adams_D",  adams + "/BC.png", gl.REPEAT, gl.REPEAT );
+    // this.makeTex( "adams_N",  adams + "/N.png",  gl.REPEAT, gl.REPEAT );
+
+    var crater   = "src/assets/textures/crater";
+    this.makeTex( "crater_AO", crater + "/AO.png", gl.REPEAT, gl.REPEAT );
+    this.makeTex( "crater_D",  crater + "/BC.png", gl.REPEAT, gl.REPEAT );
+    this.makeTex( "crater_N",  crater + "/N.png",  gl.REPEAT, gl.REPEAT );
+
+    // var eroded   = "src/assets/textures/eroded";
+    // this.makeTex( "eroded_AO", eroded + "/AO.png", gl.REPEAT, gl.REPEAT );
+    // this.makeTex( "eroded_D",  eroded + "/BC.png", gl.REPEAT, gl.REPEAT );
+    // this.makeTex( "eroded_N",  eroded + "/N.png",  gl.REPEAT, gl.REPEAT );
+
+    // var sand     = "src/assets/textures/sand";
+    // this.makeTex( "sand_AO", sand + "/AO.png", gl.REPEAT, gl.REPEAT );
+    // this.makeTex( "sand_D",  sand + "/BC.png", gl.REPEAT, gl.REPEAT );
+    // this.makeTex( "sand_N",  sand + "/N.png",  gl.REPEAT, gl.REPEAT );
+
+
+    // var volcanic = "src/assets/textures/volcanic";
+    // this.makeTex( "volcanic_AO", volcanic + "/AO.png", gl.REPEAT, gl.REPEAT );
+    // this.makeTex( "volcanic_D",  volcanic + "/BC.png", gl.REPEAT, gl.REPEAT );
+    // this.makeTex( "volcanic_N",  volcanic + "/N.png",  gl.REPEAT, gl.REPEAT );
+
+    // var solar = "src/assets/textures/solar";
+    // this.makeTex( "solar_AO", solar + "/AO.jpg", gl.REPEAT, gl.REPEAT );
+    // this.makeTex( "solar_D",  solar + "/BC.jpg", gl.REPEAT, gl.REPEAT );
+    // this.makeTex( "solar_N",  solar + "/N.jpg",  gl.REPEAT, gl.REPEAT );
 
     this.makeCube( "env", "src/assets/textures/env" );
 
@@ -70,7 +100,6 @@ class Textures {
 
     var loaded = 0;
     var _onImgLoaded = ()=>{
-      console.log("ON IMG LOADED");
       loaded += 1;
       if(loaded == tex.imgs.length){
         this.onCubeLoaded( tex );

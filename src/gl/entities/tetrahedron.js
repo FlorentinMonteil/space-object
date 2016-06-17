@@ -3,8 +3,9 @@ import Emitter         from 'eventemitter3';
 import Mouse           from 'utils/mouse';
 import GUI             from 'dev/gui';
 import GeomLoader      from 'gl/geoms/geom-loader';
+import Ease            from 'utils/ease';
 
-import PyramidPRG      from 'gl/programs/tetrahedron';
+import TetrahedronPRG  from 'gl/programs/tetrahedron';
 import tetrahedronGeom from 'gl/geoms/tetrahedron.json';
 import Textures        from 'assets/textures';
 
@@ -19,22 +20,16 @@ function map_range(value, low1, high1, low2, high2) {
     return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
 }
 
-var progress = {
-  value : 0
-}
-
-document.addEventListener("mousemove", function(e){
-  progress.value = e.clientX/window.innerWidth;
-});
+var PLACEMENT_TIME = 3000;
 
 export default class TetrahedronMesh extends Emitter {
 
-  constructor(gl, opts = {}, id){
+  constructor(gl, opts = {}){
 
     super(gl);
     this.gl = gl;
     if(prg == null){
-      prg = PyramidPRG(gl);
+      prg = TetrahedronPRG(gl);
     }
 
     this.prg       = prg;
@@ -53,6 +48,10 @@ export default class TetrahedronMesh extends Emitter {
     this._wmatrix[12] =  this.x;
     this._wmatrix[13] =  this.y;
     this._wmatrix[14] =  this.z;
+
+    this._x = opts.startX ? opts.startX : Math.random() * 5;
+    this._y = opts.startY ? opts.startY : Math.random() * 5;
+    this._z = opts.startZ ? opts.startZ : Math.random() * 5;
 
     this.geom = GeomLoader.parseFlattern( tetrahedronGeom );
 
@@ -76,31 +75,31 @@ export default class TetrahedronMesh extends Emitter {
 
 
     // NORMALS
+    this.normals = normals;
     this.normalsBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.normalsBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
     this.normalsBuffer.itemSize = 3;
     this.normalsBuffer.numItems = normals.length / 3;
 
-    this.tDiffuse          = Textures.getTexture(  'granite_D'  );
-    this.tNormalMap        = Textures.getTexture(  'granite_N'  );
-    this.tAmbiantOcclusion = Textures.getTexture(  'granite_AO' );
+    this.updateTexture( 'crater' );
 
     this.edgeIndex = null;
     this.edgeAngle = 0;
     this.spinTime  = 0;
 
-    // if(id){
-    //   this.id = id;
-    //   var ctrl = GUI.addFolder('tetrhedron__'+id);
-    //   var o = {rotate: 0};
-    //   ctrl.add(o, 'rotate', - (Math.PI * 2 - 2 * Math.acos(1/3)), 0).onChange(()=>{
-    //     this.rotateFromEdge(o.rotate - this.edgeAngle, this.edgeIndex);
-    //   });
-    //   ctrl.add(this, 'edgeIndex', [0, 1, 2, 3, 4, 5, 6]).onChange(()=>{
-    //     this.edgeIndex = parseInt(this.edgeIndex);
-    //   })
-    // }
+    this.placed = false;
+    this.placing = false;
+
+    this.lighten = 0;
+
+  }
+
+  updateTexture( name ){
+
+    this.tDiffuse          = Textures.getTexture(  name + '_D'  );
+    this.tNormalMap        = Textures.getTexture(  name + '_N'  );
+    this.tAmbiantOcclusion = Textures.getTexture(  name + '_AO' );
 
   }
 
@@ -110,9 +109,6 @@ export default class TetrahedronMesh extends Emitter {
     this.edgeIndex  = edgeIndex;
 
     var index = this.edgeIndex;
-    // if(this.edgeIndex == 6){
-    //   index = 9;
-    // }
 
     var v = this.geom.vertices;
 
@@ -129,6 +125,7 @@ export default class TetrahedronMesh extends Emitter {
     ]
 
     var axis   = [ v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2] ];
+
     var origin = v1;
     var invOrigin = [
       -origin[0],
@@ -140,6 +137,31 @@ export default class TetrahedronMesh extends Emitter {
     mat4.rotate( this.__wmatrix, this.__wmatrix, angle, axis );
     mat4.translate(this.__wmatrix, this.__wmatrix, invOrigin);
 
+  }
+
+  getNormalByFace( i ){
+    var n = this.normals;
+    return [ 
+      n[ i * 9     ],
+      n[ i * 9 + 1 ],
+      n[ i * 9 + 2 ],
+    ]
+  }
+
+  setPlaced(){
+
+    this.placed       = true;
+    this.placing      = false;
+    this.startPlacing = null;
+    TweenMax.fromTo( this, 1.0, {lighten: 0}, {lighten: 1 - 1/4} );
+    this.emit( 'placed' );
+
+  }
+
+  place(){
+    this.placed       = false;
+    this.placing      = true;
+    this.startPlacing = Date.now();
   }
 
   render(camera, lights){
@@ -168,34 +190,54 @@ export default class TetrahedronMesh extends Emitter {
     // PROJ
     this.prg.uM( this._wmatrix );
 
+    var pos = [this.x, this.y, this.z];
+    if(!this.placed){
+
+      var _t = Date.now() - this.startPlacing;
+      var p = Ease.easeOutCubic( Math.min( 1.0, _t/PLACEMENT_TIME ) );
+
+      if(p == 1)
+        this.setPlaced()
+
+      var x = this._x + ( this.x - this._x ) * p;
+      var y = this._y + ( this.y - this._y ) * p;
+      var z = this._z + ( this.z - this._z ) * p;
+      pos = [x, y, z];
+
+      if(!this.placing)
+        pos = [this._x, this._y, this._z];
+
+    }
+
     // PROJ
-    mat4.translate(M4, this.__wmatrix, [this.x, this.y, this.z]);
+    mat4.translate(M4, this.__wmatrix, pos);
 
     camera.modelViewProjectionMatrix( M4, M4 );
 
     this.prg.uMVP( M4 );
 
-    this.prg.ambientColour([1.0, 1.0, 1.0, 1.0]);
-    this.prg.diffuseColour([1.0, 1.0, 1.0, 1.0]);
-    this.prg.specularColour([1.0, 1.0, 1.0, 1.0]);
+    this.prg.ambientColor([0.3, 0.3, 0.3, 1.0]);
+    this.prg.diffuseColor([1.0, 0.9, 1.0, 1.0]);
 
     this.prg.uCameraPosition([camera.x, camera.y, camera.z]);
 
     this.prg.uLightRender( lights );
     this.prg.uLight( this.wire );
 
-    this.prg.uMouse([Mouse.x, Mouse.y]);
+    var blink = this.placed ? Math.cos(t/100)/8 : 0; 
+    this.prg.uLighten( this.lighten + blink );
 
     // TEXTURE
-    gl.uniform1i(this.prg.program.tDiffuse, 0);
+    gl.uniform1i(this.prg.tDiffuse(), 0);
+    gl.uniform1i(this.prg.tNormalMap(), 1);
+    gl.uniform1i(this.prg.tAmbiantOcclusion(), 2);
+
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.tDiffuse);
 
-    gl.uniform1i(this.prg.program.tNormalMap, 1);
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, this.tNormalMap);
 
-    gl.uniform1i(this.prg.program.tAmbiantOcclusion, 2);
     gl.activeTexture(gl.TEXTURE2);
     gl.bindTexture(gl.TEXTURE_2D, this.tAmbiantOcclusion);
 

@@ -3,7 +3,7 @@ import Ease         from 'utils/ease';
 import Mouse        from 'utils/mouse';
 import globalStates from 'states/global-states';
 import Textures     from 'assets/textures';
-
+import GUI          from 'dev/gui';
 
 import Renderer     from 'renderer';
 import Scene        from 'scene';
@@ -25,7 +25,8 @@ export default class MainGL {
 
     this.camera   = new Camera();
 
-    this.renderer = new Renderer(document.getElementById('collection-webgl'));
+    this.renderer = new Renderer(document.getElementById('canvas'));
+    Mouse.setUp(document.getElementById('canvas'));
     this.scene    = new Scene(this.renderer.gl);
 
     this.loop           = this._loop.bind(this);
@@ -38,6 +39,22 @@ export default class MainGL {
 
     this.loop();
 
+    var texCtrl = GUI.addFolder('texture');
+    var currentTexture = {t: 'crater'};
+    texCtrl.add( currentTexture, 't', [
+      'granite',
+      'adams',
+      'crater',
+      'eroded',
+      'sand',
+      'volcanic',
+      'solar'
+    ]).onChange((name)=>{
+      for (var i = 0; i < this.tetrahedrons.length; i++) {
+        this.tetrahedrons[i].updateTexture(name);
+      }
+    });
+
   }
 
   load(){
@@ -49,49 +66,66 @@ export default class MainGL {
   start(){
     globalStates.playing = true;
     startTime = Date.now();
+    this.camera.startTime = Date.now();
   }
 
   initObjects(){
 
-    this.basePyramid = new Tetrahedron( this.renderer.gl, {x: 0.0, y: 0.0, wire:true}, "1" ); 
-
-    this.rotatingPyramids = [];
+    this.tetrahedrons = [];
     var edgeIndex = 0;
     for(var i = 0; i<4; i++){
 
-      var pyramid = new Tetrahedron( this.renderer.gl, 
-        {x: 0.0, y: 0.0, z: 0.0, wire: false}, "_"+i
+      var tetrahedron = new Tetrahedron( this.renderer.gl, 
+        {
+          x: 0.0, 
+          y: 0.0, 
+          z: 0.0,
+          wire: false
+        }
       );
 
-      pyramid.rotateFromEdge(-Math.acos(1/3), 0);
-      pyramid.step = i;
+      tetrahedron.rotateFromEdge(-Math.acos(1/3), 0);
+      tetrahedron.step = i;
       var e = 0;
-      for(var j=0; j<pyramid.step; j++){
-        pyramid.edgeAngle = 0;
-        pyramid.spinTime  = 0;
+      for(var j=0; j<tetrahedron.step; j++){
+        tetrahedron.edgeAngle = 0;
+        tetrahedron.spinTime  = 0;
         var orientation = (e % 3) == 0 ? -1 : 1;
         if(j == 3){ orientation = -orientation; }
         var a = orientation * (Math.PI * 2 - 2 * Math.acos(1/3));
-        pyramid.rotateFromEdge(a, e);
+        tetrahedron.rotateFromEdge(a, e);
         e = this.getEdgeIndexByStep( e, j + 1 );
-        pyramid.edgeIndex = e;
+        tetrahedron.edgeIndex = e;
       }
 
-      pyramid.edgeAngle = 0;
-      pyramid.spinTime  = 0;
+      var a = tetrahedron.getNormalByFace( 1 );
+      var dir = 1;
+      if(i == 2){
+        dir = -1;
+      }
+      tetrahedron._x = dir * a[0] * ( 2 + Math.random() * 20 );
+      tetrahedron._y = dir * a[1] * ( 2 + Math.random() * 20 );
+      tetrahedron._z = dir * a[2] * ( 2 + Math.random() * 20 );
 
-      this.rotatingPyramids.push(pyramid);
-      this.scene.addObject(pyramid);
+      tetrahedron.edgeAngle = 0;
+      tetrahedron.spinTime  = 0;
+
+      this.tetrahedrons.push(tetrahedron);
+      this.scene.addObject(tetrahedron);
+
+      tetrahedron.place();
 
     }
-
-    // this.scene.addObject( this.basePyramid );
 
     this.innerLight = new InnerLight( this.renderer.gl );
     this.scene.addObject( this.innerLight );
 
     this.env = new Env( this.renderer.gl );
     this.scene.addObject( this.env );
+
+    this.tetrahedrons[0].on( 'placed', ()=>{
+      this.innerLight.show();
+    } );
 
   }
 
@@ -111,15 +145,26 @@ export default class MainGL {
 
     var t = Date.now() - startTime;
 
-    for (var i = 0; i < this.rotatingPyramids.length; i++) {
+    this.rotateTetra( t );
 
-      var p = this.rotatingPyramids[i];
-      var spinProgress = Ease.easeInOutCubic((t - p.spinTime)/SPIN_DURATION);
+    this.camera.update(this.w, this.h);
+
+    this.renderer.render(this.scene, this.camera);
+    window.requestAnimationFrame(this.loop);
+
+  }
+
+  rotateTetra( t ){
+    for (var i = 0; i < this.tetrahedrons.length; i++) {
+
+      var p = this.tetrahedrons[i];
+      // var spinProgress = Ease.easeInOutCubic((t - p.spinTime)/SPIN_DURATION);
+      var spinProgress = (t - p.spinTime)/SPIN_DURATION;
       var orientation = (p.edgeIndex % 3) == 0 ? -1 : 1;
       if(p.step == 3){
         orientation = -orientation;
       }
-      var a = orientation * (Math.PI * 2 - 2 * Math.acos(1/3)) * Math.max(0.0, Math.min(1.0, spinProgress));//* Ease.easeOutCubic(spinProgress);
+      var a = orientation * (Math.PI * 2 - 2 * Math.acos(1/3)) * Math.max(0.0, Math.min(1.0, spinProgress));
 
       p.rotateFromEdge(a - p.edgeAngle, p.edgeIndex);
 
@@ -136,12 +181,6 @@ export default class MainGL {
       }
 
     }
-
-    this.camera.update(this.w, this.h);
-
-    this.renderer.render(this.scene, this.camera);
-    window.requestAnimationFrame(this.loop);
-
   }
 
   getEdgeIndexByStep( currentEdgeIndex, step ){

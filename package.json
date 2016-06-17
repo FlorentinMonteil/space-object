@@ -20,7 +20,7 @@
     "glsl-easings": "^1.0.0",
     "glsl-noise": "0.0.0",
     "glslify": "^5.0.2",
-    "gsap": "^1.18.4",
+    "gsap": "^1.18.5",
     "icosphere": "^1.0.0",
     "leapjs": "^0.6.4",
     "lookat-camera": "^1.0.0",

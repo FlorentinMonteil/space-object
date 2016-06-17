@@ -12,7 +12,6 @@ const int NUM_SAMPLES = 100;
 
 void main(void){
 
-  // gl_FragColor         = texture2D(uSampler, vec2(vUv.s, vUv.t));
   gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
   vec2 deltaTextCoord = vec2( vUv - lightPositionOnScreen.xy );
   vec2 textCoo = vUv;
