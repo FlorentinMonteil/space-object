@@ -9,10 +9,15 @@ import Renderer     from 'renderer';
 import Scene        from 'scene';
 import Camera       from 'camera';
 
+import LightMap     from 'gl/entities/light-map';
+import LightFBO     from 'gl/entities/light-fbo';
 
 import Env          from 'gl/entities/env';
 import Tetrahedron  from 'gl/entities/tetrahedron';
 import InnerLight   from 'gl/entities/inner-light';
+
+import Warp         from 'gl/entities/warp';
+import WarpFBO      from 'gl/entities/warp-fbo';
 
 
 var startTime = 0;
@@ -116,7 +121,7 @@ export default class MainGL {
       tetrahedron.place();
 
     }
-
+    
     this.innerLight = new InnerLight( this.renderer.gl );
     this.scene.addObject( this.innerLight );
 
@@ -126,6 +131,16 @@ export default class MainGL {
     this.tetrahedrons[0].on( 'placed', ()=>{
       this.innerLight.show();
     } );
+
+    this.lightFBO = new LightFBO( this.renderer.gl );
+    this.lightMap = new LightMap( this.renderer.gl, this.lightFBO.FBOTexture);
+    this.scene.addObject( this.lightMap );
+
+    this.warpFBO = new WarpFBO( this.renderer.gl );
+    this.warp = new Warp( this.renderer.gl, this.warpFBO.FBOTexture );
+    this.scene.addObject( this.warp );
+
+    this.warp.hide();
 
   }
 
@@ -149,7 +164,16 @@ export default class MainGL {
 
     this.camera.update(this.w, this.h);
 
-    this.renderer.render(this.scene, this.camera);
+    var gl = this.renderer.gl;
+
+    gl.enable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
+
+    this.lightFBO.render( this.scene, this.camera );    
+    this.warpFBO.render( this.camera );
+
+    this.renderer.render( this.scene, this.camera );
+
     window.requestAnimationFrame(this.loop);
 
   }

@@ -15,9 +15,9 @@ export default class Renderer{
 
     this.gl.getExtension( 'OES_standard_derivatives' );
 
-    this.lightFBO = new LightFBO( gl );
+    // this.lightFBO = new LightFBO( this.gl );
 
-    this.lightMap = new LightMap(this.gl, this.lightFBO.FBOTexture);
+    // this.lightMap = new LightMap( this.gl, this.lightFBO.FBOTexture );
 
     this.resize();
 
@@ -44,13 +44,16 @@ export default class Renderer{
 
     let gl = this.gl;
 
-    gl.enable(gl.DEPTH_TEST);
-    this.lightFBO.render( scene, camera );
+    // gl.enable(gl.DEPTH_TEST);
+    // gl.disable(gl.BLEND);
+    // this.lightFBO.render( scene, camera );
+
     this.defaultConf();
     scene.render(camera, false);
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.ONE, gl.ONE);
-    this.lightMap.render();
+    
+    // gl.disable(gl.DEPTH_TEST);
+    // gl.blendFunc(gl.ONE, gl.ONE);
+    // this.lightMap.render();
 
   }
 
@@ -59,7 +62,8 @@ export default class Renderer{
     gl.viewport(0, 0, this.cvs.width, this.cvs.height);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.cullFace(gl.BACK);
-    gl.disable(gl.BLEND);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   }
 
 }

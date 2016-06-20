@@ -22,7 +22,6 @@
     "glslify": "^5.0.2",
     "gsap": "^1.18.5",
     "icosphere": "^1.0.0",
-    "leapjs": "^0.6.4",
     "lookat-camera": "^1.0.0",
     "nanogl": "0.2.5",
     "nanogl-camera": "^0.1.2",

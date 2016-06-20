@@ -99,7 +99,7 @@ export default class Camera extends Emitter{
 
     glMatrix.mat4.perspective(
       this._proj, 
-      this.fov, //fov
+      this.fov, // fov
       w / h,    // aspect
       0.1,      // near
       1000.0    // far
@@ -113,7 +113,7 @@ export default class Camera extends Emitter{
     this.panX -= ( this.panX - this._pan[0] ) / 10;
     this.panY -= ( this.panY - this._pan[1] ) / 10;
     var phi    = this.panX * Math.PI*2;
-    var theta  = ((this.panY + 1)/2) * Math.PI;
+    var theta  = ( ( this.panY + 1 ) / 2 ) * Math.PI;
     this.z = Math.cos(phi) * radius;
     this.x = Math.sin(phi) * radius;
     this.y = Math.cos(theta) * radius;

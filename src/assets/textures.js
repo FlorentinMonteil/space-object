@@ -27,6 +27,8 @@ class Textures {
     this.makeTex( "crater_D",  crater + "/BC.png", gl.REPEAT, gl.REPEAT );
     this.makeTex( "crater_N",  crater + "/N.png",  gl.REPEAT, gl.REPEAT );
 
+    this.makeTex( "space", "src/assets/textures/env/negx.jpg", gl.REPEAT, gl.REPEAT );
+
     // var eroded   = "src/assets/textures/eroded";
     // this.makeTex( "eroded_AO", eroded + "/AO.png", gl.REPEAT, gl.REPEAT );
     // this.makeTex( "eroded_D",  eroded + "/BC.png", gl.REPEAT, gl.REPEAT );
@@ -49,6 +51,8 @@ class Textures {
     // this.makeTex( "solar_N",  solar + "/N.jpg",  gl.REPEAT, gl.REPEAT );
 
     this.makeCube( "env", "src/assets/textures/env" );
+
+    this.makeCube( "env_green", "src/assets/textures/env-green" );
 
   }
 
@@ -168,6 +172,7 @@ class Textures {
   onCubeLoaded( tex ){
 
     var gl = this.gl;
+    gl.bindTexture( gl.TEXTURE_CUBE_MAP, tex );
     gl.texImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tex.imgs[0].img );
     gl.texImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tex.imgs[1].img );
     gl.texImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tex.imgs[2].img );
