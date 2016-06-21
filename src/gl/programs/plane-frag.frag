@@ -8,7 +8,7 @@ uniform float decay;
 uniform float density;
 uniform float weight;
 const vec2 lightPositionOnScreen = vec2(0.5, 0.5);
-const int NUM_SAMPLES = 100;
+const int NUM_SAMPLES = 30;
 
 void main(void){
 

@@ -31,10 +31,10 @@ export default class LightMap {
 
     this.prg.use();
 
-    this.exposure              = 0.10;
-    this.decay                 = 1;
+    this.exposure              = 0.52;
+    this.decay                 = 0.95;
     this.density               = 1;
-    this.weight                = 0.13;
+    this.weight                = 0.24;
     this.lightPositionOnScreen = {
       x: 0.5,
       y: 0.5

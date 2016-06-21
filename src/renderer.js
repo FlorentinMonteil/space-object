@@ -13,7 +13,7 @@ export default class Renderer{
 
     let gl = this.gl;
 
-    this.gl.getExtension( 'OES_standard_derivatives' );
+    // this.gl.getExtension( 'OES_standard_derivatives' );
 
     // this.lightFBO = new LightFBO( this.gl );
 
@@ -32,8 +32,8 @@ export default class Renderer{
     this.wHeight      = window.innerHeight;
     cvs.style.width   = this.wWidth + "px";
     cvs.style.height  = this.wHeight + "px";
-    cvs.width         = this.wWidth * window.devicePixelRatio;
-    cvs.height        = this.wHeight * window.devicePixelRatio;
+    cvs.width         = this.wWidth;// * window.devicePixelRatio;
+    cvs.height        = this.wHeight;// * window.devicePixelRatio;
     gl.viewportWidth  = cvs.width;
     gl.viewportHeight = cvs.height;
     gl.viewport(0, 0, cvs.width, cvs.height);
@@ -51,7 +51,7 @@ export default class Renderer{
     this.defaultConf();
     scene.render(camera, false);
     
-    // gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.DEPTH_TEST);
     // gl.blendFunc(gl.ONE, gl.ONE);
     // this.lightMap.render();
 

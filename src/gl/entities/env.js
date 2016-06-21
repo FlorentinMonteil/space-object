@@ -26,7 +26,7 @@ export default class Env {
     this._wmatrix[13] = 0;
     this._wmatrix[14] = 0;
 
-    mat4.scale( this._wmatrix, this._wmatrix, [50.0, 50.0, 50.0] );
+    mat4.scale( this._wmatrix, this._wmatrix, [-50.0, -50.0, -50.0] );
 
     this.prg       = prg;
 

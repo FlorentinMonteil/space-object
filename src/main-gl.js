@@ -140,7 +140,7 @@ export default class MainGL {
     this.warp = new Warp( this.renderer.gl, this.warpFBO.FBOTexture );
     this.scene.addObject( this.warp );
 
-    this.warp.hide();
+    // this.warp.hide();
 
   }
 

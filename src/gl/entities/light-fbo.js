@@ -6,7 +6,7 @@ export default class LightFBO {
 
     this.FBO = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.FBO);
-    this.fboSampleSize   = 1024;
+    this.fboSampleSize   = 512;
     this.FBO.width  = this.fboSampleSize;
     this.FBO.height = this.fboSampleSize;
 

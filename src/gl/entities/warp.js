@@ -47,11 +47,40 @@ export default class Warp {
 
     this.texture = texture;
 
+    // document.addEventListener('click', ()=>{
+    //   this.hide();
+    //   TweenMax.delayedCall(4, this.show.bind(this));
+    // });
+
+
+
+    // window.setInterval(()=>{
+    //   this.hide();
+    //   TweenMax.delayedCall(4, this.show.bind(this));
+    // }, 8000);
+
+    // this.hide();
+    // TweenMax.delayedCall(4, this.show.bind(this));
+
+    document.addEventListener('mousedown', ()=>{
+      this.hide();
+    });
+
+    document.addEventListener('mouseup', ()=>{
+      this.show();
+    });
+
+
   }
 
   hide(){
-    return;
-    TweenMax.fromTo(this, 3, {radius: 0}, {delay: 1.4, radius: 1, ease: Power2.easeOut});
+    TweenMax.killTweensOf(this);
+    TweenMax.to(this, 2.0, {radius: 0.85, ease: Power2.easeOut});
+  }
+
+  show(){
+    TweenMax.killTweensOf(this);
+    TweenMax.to(this, 2, {radius: 0, ease: Power2.easeInOut});
   }
 
   render( camera, lightPass ){

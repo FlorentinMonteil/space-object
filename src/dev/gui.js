@@ -1,6 +1,6 @@
 var Dat = require( 'dat-gui' )
 
-var DISABLED = false;
+var DISABLED = true;
 
 var gui = new Dat.GUI()
 // gui.close()""

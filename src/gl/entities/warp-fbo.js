@@ -50,7 +50,7 @@ export default class WarpFBO {
     this._wmatrix[13] = 0;
     this._wmatrix[14] = 0;
 
-    mat4.scale( this._wmatrix, this._wmatrix, [50.0, 50.0, 50.0] );
+    mat4.scale( this._wmatrix, this._wmatrix, [.5, .5, .5] );
 
     this.prg       = prg;
 
@@ -74,7 +74,7 @@ export default class WarpFBO {
   }
 
   render( camera ){
-    return;
+
     var gl = this.gl;
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.FBO);
@@ -102,9 +102,8 @@ export default class WarpFBO {
 
     gl.drawElements( gl.TRIANGLES, this.indicesBuffer.numItems, gl.UNSIGNED_SHORT, 0 );
 
-    gl.bindTexture( gl.TEXTURE_CUBE_MAP, null );
-    gl.bindTexture(gl.TEXTURE_2D, null);
     gl.generateMipmap(gl.TEXTURE_2D);
+    gl.bindTexture(gl.TEXTURE_2D, null);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
   }
